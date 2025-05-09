@@ -28,8 +28,18 @@ class Actuator:
         logging.info(f"Actuator Client {self.did} starting")
 
         # TODO: START
-        # send request to cloud service with regular intervals and
-        # set state of actuator according to the received response
+        url = common.BASE_URL + f"actuator/{self.did}/current"
+
+        payload = {}
+        headers = {}
+
+        while True:
+            response = requests.request("GET", url, headers=headers, data=payload)
+
+            self.state = ActuatorState.from_json(response.text)
+
+            logging.info(f"Actuator Client {self.did} {self.state.state}")
+            time.sleep(common.LIGHTBULB_CLIENT_SLEEP_TIME)
 
         logging.info(f"Client {self.did} finishing")
 
@@ -37,12 +47,15 @@ class Actuator:
 
     def run(self):
 
-        pass
+
         # TODO: START
 
-        # start thread simulating physical light bulb
+        sensor_thread = threading.Thread(target=self.simulator)
+        sensor_thread.start()
 
         # start thread receiving state from the cloud
+        client_thread = threading.Thread(target=self.client)
+        client_thread.start()
 
         # TODO: END
 

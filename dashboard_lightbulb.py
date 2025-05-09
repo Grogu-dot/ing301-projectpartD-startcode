@@ -15,7 +15,13 @@ def lightbulb_cmd(state, did):
 
     # TODO: START
     # send HTTP request with new actuator state to cloud service
+    new_state = "running" if state.get() == 'On' else "off"
 
+    payload = ActuatorState(new_state).to_json()
+    headers = {'Content-Type': 'application/json'}
+    url = f"{common.BASE_URL}actuator/{did}/"
+
+    response = requests.put(url, headers=headers, data=payload)
 
     # TODO: END
 
